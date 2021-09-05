@@ -1,0 +1,15 @@
+{
+    "name": "tera",
+    "version": "1.0.0",
+    "description": "Tuos plugins installer for Fastify",
+    "main": "index.js",
+    "repository": "https://github.com/eru123/tera.git",
+    "author": "eru123 <yeoligoakino@gmail.com>",
+    "license": "Apache-2.0",
+    "private": false,
+    "dependencies": {
+        "auto-load": "^3.0.4",
+        "fastify-plugin": "^3.0.0",
+        "lodash": "^4.17.21"
+    }
+}
