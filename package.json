@@ -1,5 +1,5 @@
 {
-    "name": "tera",
+    "name": "tuos-tera",
     "version": "1.0.0",
     "description": "Tuos plugins installer for Fastify",
     "main": "index.js",
