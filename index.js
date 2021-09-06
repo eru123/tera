@@ -20,7 +20,9 @@ const plugin = async (fastify, options, done) => {
 
     const install = async (key) => {
         try {
-            if (installed.indexOf(key) > -1) {
+            if(key in fastify[name].plugins) {
+                console.warn('[PLUGIN] ' + key + ': Plugin already exists')
+            } else if (installed.indexOf(key) > -1) {
                 console.warn('[PLUGIN] ' + key + ': Already installed')
             } else if (!(key in plugins)) {
                 console.warn('[PLUGIN] ' + key + ': Not listed')
