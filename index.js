@@ -14,11 +14,13 @@ const plugin = async (fastify, options, done) => {
     let plugins = {}
     const dir = path.resolve(options.dir) 
     const raw = _.omit(autoload(dir), excluded)
+
     for (const key in raw) if ('index' in raw[key] && 'plugin' in raw[key].index) plugins[key] = raw[key].index
 
     const installed = []
 
     const install = async (key) => {
+
         try {
             if(key in fastify[name].plugins) {
                 console.warn('[PLUGIN] ' + key + ': Plugin already exists')
@@ -45,6 +47,16 @@ const plugin = async (fastify, options, done) => {
         for(const key in globalOpts) fastify[name].options[key] = globalOpts[key]
     } else fastify.decorate(name, {plugins, options: globalOpts, custom})
 
+    if('mongoose' in fastify) {
+        for(key in plugins) {
+            if('models' in plugins[key]){
+                for(const model in plugins[key].models) {
+                    fastify.mongoose.model(model, plugins[key].models[model])
+                }
+            }
+        }
+    }
+    
     const installOrder = async (orderList) => {
         if(!(typeof orderList === 'object')) throw new Error(`[PLUGIN] 'order' must be an array`)
         if(!Array.isArray(orderList)) throw new Error(`[PLUGIN] 'order' must be an array`)
