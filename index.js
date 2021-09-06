@@ -3,7 +3,6 @@ const fp = require('fastify-plugin')
 const path = require('path')
 const _ = require('lodash')
 
-
 const plugin = async (fastify, options, done) => {
     const name = options.name || 'tuos'
     const globalOpts = options.options || {}
@@ -20,25 +19,29 @@ const plugin = async (fastify, options, done) => {
     const installed = []
 
     const install = async (key) => {
-        console.log(`[PLUGIN] ${key}: Installing...`)
         try {
             if (installed.indexOf(key) > -1) {
-                console.log('[PLUGIN] ' + key + ': Already installed')
+                console.warn('[PLUGIN] ' + key + ': Already installed')
             } else if (!(key in plugins)) {
                 console.warn('[PLUGIN] ' + key + ': Not listed')
             } else {
+                console.log(`[PLUGIN] ${key}: Installing...`)   
                 installed.push(key)
                 await fastify.after()
                 await fastify.register(plugins[key].plugin, globalOpts)
                 console.log('[PLUGIN] ' + key + ': Installed')
             }
         } catch (e) {
-            console.error('[PLUGIN] ' + key + ': Failed to install', e)
-            process.exit(1)
+            console.error(`[PLUGIN] ${key}: Failed to install. ${e.name}: ${e.message}`)
         }
     }
 
     if (only.length > 0) plugins = _.pick(plugins, only)
+    
+    if(name in fastify) {
+        for(const key in plugins) fastify[name].plugins[key] = plugins[key]
+        for(const key in globalOpts) fastify[name].options[key] = globalOpts[key]
+    } else fastify.decorate(name, {plugins, options: globalOpts, custom})
 
     const installOrder = async (orderList) => {
         if(!(typeof orderList === 'object')) throw new Error(`[PLUGIN] 'order' must be an array`)
@@ -53,11 +56,6 @@ const plugin = async (fastify, options, done) => {
 
     for(const key in _.omit(plugins,installed)) if (last.indexOf(key) > -1) await install(key)
     for(const key in  _.omit(plugins,installed)) await install(key)
-    
-    if(name in fastify) {
-        for(const key in plugins) fastify[name].plugins[key] = plugins[key]
-        for(const key in globalOpts) fastify[name].options[key] = globalOpts[key]
-    } else fastify.decorate(name, {plugins, options: globalOpts, custom})
 
     done()
 }
