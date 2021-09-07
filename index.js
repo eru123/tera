@@ -20,11 +20,8 @@ const plugin = async (fastify, options, done) => {
     const installed = []
 
     const install = async (key) => {
-
         try {
-            if(key in fastify[name].plugins) {
-                console.warn('[PLUGIN] ' + key + ': Plugin already exists')
-            } else if (installed.indexOf(key) > -1) {
+            if (installed.indexOf(key) > -1) {
                 console.warn('[PLUGIN] ' + key + ': Already installed')
             } else if (!(key in plugins)) {
                 console.warn('[PLUGIN] ' + key + ': Not listed')
@@ -51,7 +48,9 @@ const plugin = async (fastify, options, done) => {
         for(key in plugins) {
             if('models' in plugins[key]){
                 for(const model in plugins[key].models) {
-                    fastify.mongoose.model(model, plugins[key].models[model])
+                    if(typeof plugins[key].models[model] === 'function') {
+                        plugins[key].models[model](fastify)
+                    }
                 }
             }
         }
