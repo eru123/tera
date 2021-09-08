@@ -1,6 +1,6 @@
 {
     "name": "tuos-tera",
-    "version": "1.0.7",
+    "version": "1.0.8",
     "description": "Tuos plugins installer for Fastify",
     "main": "index.js",
     "repository": "https://github.com/eru123/tera.git",
