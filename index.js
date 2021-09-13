@@ -14,12 +14,17 @@ const plugin = async (fastify, options, done) => {
   let plugins = {}
   const dir = path.resolve(options.dir)
   const raw = _.omit(autoload(dir), excluded)
+  const reserved = ['app', 'options', 'config', 'plugins']
 
   for (const key in raw) if ('index' in raw[key] && 'plugin' in raw[key].index) plugins[key] = raw[key].index
 
   const installed = []
 
   const install = async (key) => {
+    if (reserved.indexOf(key) > -1) {
+      console.error(`[PLUGIN] ${key}: plugin name is a reserve keyword`)
+    }
+
     try {
       if (installed.indexOf(key) > -1) {
         console.warn('[PLUGIN] ' + key + ': Already installed')
